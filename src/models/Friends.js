@@ -1,0 +1,16 @@
+const mongoose = require("mongoose");
+
+const FriendsSchema = new mongoose.Schema(
+  {
+    senderId: {
+      type: String,
+      required: true,
+    },
+    listFriend: {
+      type: [String],
+      default: [],
+    },
+  },
+  { timestamps: true }
+);
+module.exports = mongoose.model("Friends", FriendsSchema);

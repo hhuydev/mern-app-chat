@@ -7,7 +7,7 @@ router.get("/:userId", conversationController.getConverByUser);
 router.post("/", conversationController.createConversation);
 router.get(
   "/find/:firstUserId/:secondUserId",
-  conversationController.getConverByUser
+  conversationController.getConversationByTwoUser
 );
 
 module.exports = router;

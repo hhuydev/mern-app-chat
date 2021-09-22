@@ -1,12 +1,13 @@
 const Conversation = require("../models/Conversation");
+const Message = require("../models/Message");
 
 class ConversationController {
   async getConverByUser(req, res, next) {
     try {
-      const conversation = await Conversation.find({
+      const conversations = await Conversation.find({
         members: { $in: [req.params.userId] },
       });
-      res.status(200).send({ conversation });
+      res.status(200).send({ conversations });
     } catch (error) {
       res.status(500).send(error);
     }
@@ -14,6 +15,7 @@ class ConversationController {
   async createConversation(req, res, next) {
     const newConversation = new Conversation({
       members: [req.body.senderId, req.body.receiverId],
+      name: req.body.name,
     });
     try {
       await newConversation.save();
@@ -24,7 +26,7 @@ class ConversationController {
   }
   async getConversationByTwoUser(req, res, next) {
     try {
-      const conversation = await Conversation.findOne({
+      const conversation = await Conversation.find({
         members: { $all: [req.params.firstUserId, req.params.secondUserId] },
       });
       res.status(200).send({ conversation });
