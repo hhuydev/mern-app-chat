@@ -6,9 +6,9 @@ const FriendsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    listFriend: {
-      type: [String],
-      default: [],
+    friend: {
+      type: String,
+      unique: true,
     },
   },
   { timestamps: true }

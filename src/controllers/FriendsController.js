@@ -21,8 +21,8 @@ class FriendsController {
         console.log(req.body.receiverId);
         newListFriend = new Friends({
           senderId: sender._id,
+          friend: req.body.receiverId,
         });
-        newListFriend.listFriend.push(req.body.receiverId);
 
         await newListFriend.save();
         res.status(201).send({ newListFriend });
@@ -54,16 +54,11 @@ class FriendsController {
       if (!friend)
         return res.status(404).send({ message: "Friend not found!" });
 
-      const friends = await Friends.find({ senderId: req.body.senderId });
+      const findFriend = await Friends.findOne({ friend: req.body.friendId });
 
-      const updateListFriend = friends.listFriend.filter(
-        (friend) => friend !== req.body.friendId
-      );
-      console.log(updateListFriend);
+      const friends = await Friends.findByIdAndDelete(findFriend._id);
 
-      friends.listFriend = updateListFriend;
-      await friends.save();
-      res.status(200).send({ friends });
+      res.status(200).send({ message: "Unfriend success", friends });
     } catch (error) {
       res.status(500).send(error);
     }
