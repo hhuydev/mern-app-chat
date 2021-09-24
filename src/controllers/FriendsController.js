@@ -1,30 +1,35 @@
 const Friends = require("../models/Friends");
 const User = require("../models/User");
+const HttpError = require("../utils/http-error");
 
 class FriendsController {
   async sendFriendRequest(req, res, next) {
     try {
       const sender = await User.findById(req.body.senderId);
+      // const sender = req.user;
       const receiver = await User.findById(req.body.receiverId);
 
-      if (!sender) return res.status(404).send({ message: "User not found!" });
-      if (!receiver)
-        return res.status(404).send({ message: "Receiver not found!" });
+      if (!sender) return next(new HttpError("User not found!", 404));
+      if (!receiver) return next(new HttpError("Receiver not found!", 404));
+      // const user2 = await User.findById(sender._id);
+      // console.log(user2);
       const findExistingFriend = await Friends.findOne({
         senderId: req.body.senderId,
         friend: req.body.receiverId,
       });
-
+      console.log(findExistingFriend);
       if (findExistingFriend)
-        return res.status(404).send({
-          message: "Can not send invite friend who already in your list friend",
-        });
+        return next(
+          new HttpError(
+            "Can not send invite friend who already in your list friend",
+            400
+          )
+        );
 
       let newListFriend;
 
-      console.log(req.body.receiverId);
       newListFriend = new Friends({
-        senderId: sender._id,
+        senderId: sender.userId,
         friend: req.body.receiverId,
       });
 

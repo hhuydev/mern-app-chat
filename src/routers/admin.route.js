@@ -1,11 +1,12 @@
 const exppress = require("express");
 const adminController = require("../controllers/AdminController");
+const auth = require("../middleware/auth");
 
 const router = exppress.Router();
 
-router.get("/:adminId", adminController.getAllUser);
-router.post("/:adminId/lockAccount", adminController.lockingUserAccount);
-router.post("/:adminId/unlockAccount", adminController.unlockUserAccount);
-router.delete("/:adminId/deleteAccount", adminController.deleteUserAccount);
+router.get("/getAllUser", auth, adminController.getAllUser);
+router.post("/lockAccount", auth, adminController.lockingUserAccount);
+router.post("/unlockAccount", auth, adminController.unlockUserAccount);
+router.delete("/deleteAccount", auth, adminController.deleteUserAccount);
 
 module.exports = router;

@@ -43,7 +43,6 @@ class UserController {
         req.body.password,
         next
       );
-      console.log(userLogin);
       let token;
       try {
         token = jwt.sign(
@@ -61,6 +60,11 @@ class UserController {
     }
   }
 
+  logout(req, res, next) {
+    req.token = null;
+    res.redirect("/");
+  }
+
   async update(req, res, next) {
     const updates = Object.keys(req.body);
     const allowedUpdates = ["username", "email", "password"];
@@ -70,11 +74,12 @@ class UserController {
     if (!isValidOperation) res.status(404).send({ error: "Invalid updates!" });
 
     try {
-      const updateUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-      });
+      const updateUser = req.user;
       if (!updateUser) return res.send(404).send({ error: "Not found user!" });
+
+      updates.forEach((update) => (updateUser[update] = req.body[update]));
+      await updateUser.save();
+
       res.status(200).send({
         message: "Update user success",
         updateUser,
@@ -86,9 +91,10 @@ class UserController {
 
   async delete(req, res, next) {
     try {
-      const deleteUser = await User.findByIdAndDelete(req.params.id);
+      const deleteUser = req.user;
       if (!deleteUser)
         return res.status(404).send({ error: "User not found!" });
+      await req.user.remove();
       res.status(200).send({
         message: "Delete user success",
         deleteUser,
@@ -98,14 +104,8 @@ class UserController {
     }
   }
 
-  async getUser(req, res, next) {
-    try {
-      const findUser = await User.findById(req.params.id);
-      if (!findUser) return res.status(404).send({ error: "Not found user!" });
-      res.send(findUser);
-    } catch (error) {
-      res.status(500).send({ error: "Server error" });
-    }
+  getUser(req, res, next) {
+    res.send(req.user);
   }
 }
 
