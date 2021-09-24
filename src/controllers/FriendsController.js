@@ -10,23 +10,26 @@ class FriendsController {
       if (!sender) return res.status(404).send({ message: "User not found!" });
       if (!receiver)
         return res.status(404).send({ message: "Receiver not found!" });
-      const friends = await Friends.findById(req.body.senderId);
+      const findExistingFriend = await Friends.findOne({
+        senderId: req.body.senderId,
+        friend: req.body.receiverId,
+      });
 
-      let newListFriend;
-      if (friends) {
-        friends.listFriend.push(req.body.receiverId);
-        await friends.save();
-        res.status(200).send({ friends });
-      } else {
-        console.log(req.body.receiverId);
-        newListFriend = new Friends({
-          senderId: sender._id,
-          friend: req.body.receiverId,
+      if (findExistingFriend)
+        return res.status(404).send({
+          message: "Can not send invite friend who already in your list friend",
         });
 
-        await newListFriend.save();
-        res.status(201).send({ newListFriend });
-      }
+      let newListFriend;
+
+      console.log(req.body.receiverId);
+      newListFriend = new Friends({
+        senderId: sender._id,
+        friend: req.body.receiverId,
+      });
+
+      await newListFriend.save();
+      res.status(201).send({ newListFriend });
     } catch (error) {
       res.status(500).send(error);
     }

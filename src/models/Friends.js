@@ -8,7 +8,6 @@ const FriendsSchema = new mongoose.Schema(
     },
     friend: {
       type: String,
-      unique: true,
     },
   },
   { timestamps: true }
