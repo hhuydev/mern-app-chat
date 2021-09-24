@@ -1,15 +1,66 @@
 const User = require("../models/User");
+const HttpError = require("../utils/http-error");
+const jwt = require("jsonwebtoken");
 
 class UserController {
-  async create(req, res, next) {
+  async signUp(req, res, next) {
     try {
-      const newUser = new User(req.body);
-      await newUser.save();
-      res.status(201).send({ newUser });
+      const { email } = req.body;
+
+      let findExistingUser = await User.findOne({ email });
+      if (findExistingUser)
+        return next(new HttpError("User existing. Please login instead", 422));
+      else {
+        const newUser = new User(req.body);
+        try {
+          await newUser.save();
+        } catch (error) {
+          return next(new HttpError("Signup failed, try again", 500));
+        }
+
+        let token;
+        try {
+          token = jwt.sign(
+            { userId: newUser._id, email: newUser.email },
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: "1h" }
+          );
+        } catch (error) {
+          return next(new HttpError("Can not generate token", 500));
+        }
+
+        res.status(201).send({ newUser, token });
+      }
     } catch (error) {
       res.status(500).send(error);
     }
   }
+
+  async login(req, res, next) {
+    try {
+      const userLogin = await User.findByCredentials(
+        req.body.email,
+        req.body.password,
+        next
+      );
+      console.log(userLogin);
+      let token;
+      try {
+        token = jwt.sign(
+          { userId: userLogin._id, email: userLogin.email },
+          process.env.JWT_SECRET_KEY,
+          { expiresIn: "1h" }
+        );
+      } catch (error) {
+        return next(new HttpError("Can not generate token", 500));
+      }
+      // const token = await userLogin.generateAuthToken();
+      res.status(200).send({ userLogin, token });
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  }
+
   async update(req, res, next) {
     const updates = Object.keys(req.body);
     const allowedUpdates = ["username", "email", "password"];

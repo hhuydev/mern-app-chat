@@ -2,7 +2,7 @@ const Friends = require("../models/Friends");
 const User = require("../models/User");
 
 class FriendsController {
-  async sendInviteFriend(req, res, next) {
+  async sendFriendRequest(req, res, next) {
     try {
       const sender = await User.findById(req.body.senderId);
       const receiver = await User.findById(req.body.receiverId);
