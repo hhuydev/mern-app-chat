@@ -12,6 +12,7 @@ class UserController {
         return next(new HttpError("User existing. Please login instead", 422));
       else {
         const newUser = new User(req.body);
+        newUser.isOnline = true;
         try {
           await newUser.save();
         } catch (error) {
@@ -32,7 +33,7 @@ class UserController {
         res.status(201).send({ newUser, token });
       }
     } catch (error) {
-      res.status(500).send(error);
+      return next(new HttpError("Server error", 500));
     }
   }
 
@@ -43,6 +44,12 @@ class UserController {
         req.body.password,
         next
       );
+      userLogin.isOnline = true;
+      try {
+        await userLogin.save();
+      } catch (error) {
+        return next(new HttpError("Login failed, try again", 500));
+      }
       let token;
       try {
         token = jwt.sign(
@@ -53,16 +60,23 @@ class UserController {
       } catch (error) {
         return next(new HttpError("Can not generate token", 500));
       }
-      // const token = await userLogin.generateAuthToken();
+
       res.status(200).send({ userLogin, token });
     } catch (error) {
-      res.status(500).send(error);
+      return next(new HttpError("Server error", 500));
     }
   }
 
-  logout(req, res, next) {
+  async logout(req, res, next) {
+    const user = await User.findById(req.user._id);
+    user.isOnline = false;
+    try {
+      await user.save();
+    } catch (error) {
+      return next(new HttpError("Logout failed, try again", 500));
+    }
     req.token = null;
-    res.redirect("/");
+    res.status(200).send({ message: "Logout success" });
   }
 
   async update(req, res, next) {
