@@ -1,6 +1,6 @@
 const Friends = require("../models/Friends");
 const User = require("../models/User");
-const FriendRequestStatus = require("../../FriendRequestStatus");
+const FriendRequestStatus = require("../models/FriendRequestStatus");
 const HttpError = require("../utils/http-error");
 
 let save_sender;
@@ -13,12 +13,21 @@ class FriendsController {
       if (!sender) return next(new HttpError("User not found!", 404));
       if (!receiver) return next(new HttpError("Receiver not found!", 404));
 
+      if (req.user._id.toString() === req.body.receiverId)
+        return next(
+          new HttpError("You can not send request friend by yourself!", 400)
+        );
+
       const findExistingFriend = await Friends.findOne({
-        senderId: req.user._id,
+        senderId: req.user._id.toString(),
         friend: req.body.receiverId,
       });
-      console.log(findExistingFriend);
-      if (findExistingFriend)
+
+      const findExistingFriend_2 = await Friends.findOne({
+        senderId: req.body.receiverId,
+        friend: req.user._id.toString(),
+      });
+      if (findExistingFriend || findExistingFriend_2)
         return next(
           new HttpError(
             "Can not send friend request who already in your list friend",

@@ -33,12 +33,12 @@ app.use((req, res, next) => {
   throw new HttpError("Invalid route", 404);
 });
 
-app.use((err, req, res, next) => {
-  res.locals.error = err;
-  if (err.status >= 100 && err.status < 600) res.status(err.status);
-  else res.status(500);
-  res.render("error");
-});
+// app.use((err, req, res, next) => {
+//   res.locals.error = err;
+//   if (err.status >= 100 && err.status < 600) res.status(err.status);
+//   else res.status(500);
+//   res.render("error");
+// });
 
 /**Su dung middleware error default cho express cung cap khi co bat cu loi nao cac route */
 app.use((error, req, res, next) => {

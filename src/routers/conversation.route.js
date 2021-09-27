@@ -1,12 +1,18 @@
 const express = require("express");
 const conversationController = require("../controllers/ConversationController");
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
-router.get("/:userId", conversationController.getConverByUser);
-router.post("/", conversationController.createConversation);
+router.get("/get-conversations", auth, conversationController.getConversations);
+router.post(
+  "/create-conversation",
+  auth,
+  conversationController.createConversation
+);
 router.get(
-  "/find/:firstUserId/:secondUserId",
+  "/get-conversation",
+  auth,
   conversationController.getConversationByTwoUser
 );
 
