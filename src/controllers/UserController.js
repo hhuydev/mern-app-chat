@@ -68,15 +68,19 @@ class UserController {
   }
 
   async logout(req, res, next) {
-    const user = await User.findById(req.user._id);
-    user.isOnline = false;
     try {
-      await user.save();
+      const user = await User.findById(req.user._id);
+      user.isOnline = false;
+      try {
+        await user.save();
+      } catch (error) {
+        return next(new HttpError("Logout failed, try again", 500));
+      }
+      req.token = null;
+      res.status(200).send({ message: "Logout success" });
     } catch (error) {
-      return next(new HttpError("Logout failed, try again", 500));
+      return next(new HttpError("Server error", 500));
     }
-    req.token = null;
-    res.status(200).send({ message: "Logout success" });
   }
 
   async update(req, res, next) {
@@ -99,7 +103,7 @@ class UserController {
         updateUser,
       });
     } catch (error) {
-      res.status(500).send({ error: "Server error" });
+      return next(new HttpError("Server error", 500));
     }
   }
 
@@ -114,12 +118,48 @@ class UserController {
         deleteUser,
       });
     } catch (error) {
-      res.status(500).send({ error: "Server error" });
+      return next(new HttpError("Server error", 500));
     }
   }
 
   getUser(req, res, next) {
     res.send(req.user);
+  }
+
+  async uploadAvatar(req, res, next) {
+    try {
+      const user = req.user;
+      if (!user) return next(new HttpError("User not found!", 404));
+      if (!req.file) return next(new HttpError("File not found!", 404));
+
+      user.avatar = req.file.path;
+      try {
+        await user.save();
+      } catch (error) {
+        return next(new HttpError("Failed to upload avatar, try again", 400));
+      }
+      res.status(200).send({ message: "Upload avatar success", user });
+    } catch (error) {
+      return next(new HttpError("Server error", 500));
+    }
+  }
+
+  async deleteAvatar(req, res, next) {
+    try {
+      const user = req.user;
+      if (!user) return next(new HttpError("User not found!", 404));
+      if (user.avatar.length === 0)
+        return next(new HttpError("You have not uploaded avatar yet!", 404));
+      user.avatar = "";
+      try {
+        await user.save();
+      } catch (error) {
+        return next(new HttpError("Can not delete avatar, try again!", 500));
+      }
+      res.status(200).send({ message: "Delete avatar success", user });
+    } catch (error) {
+      return next(new HttpError("Server error", 500));
+    }
   }
 }
 

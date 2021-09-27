@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     avatar: {
-      type: Buffer,
+      type: String,
     },
     city: {
       type: String,

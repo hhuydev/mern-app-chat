@@ -1,6 +1,6 @@
 const Friends = require("../models/Friends");
 const User = require("../models/User");
-const FriendRequestStatus = require("../models/FriendRequestStatus");
+const FriendRequestStatus = require("../../FriendRequestStatus");
 const HttpError = require("../utils/http-error");
 
 let save_sender;
