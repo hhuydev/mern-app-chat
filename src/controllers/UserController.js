@@ -44,6 +44,10 @@ class UserController {
         req.body.password,
         next
       );
+      if (userLogin.isLocked)
+        return next(
+          new HttpError("Login failed, your account was locked by admin", 400)
+        );
       userLogin.isOnline = true;
       try {
         await userLogin.save();
