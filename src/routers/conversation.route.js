@@ -15,5 +15,10 @@ router.get(
   auth,
   conversationController.getConversationByTwoUser
 );
+router.post(
+  "/invite-user-to-conversation",
+  auth,
+  conversationController.addUserToConversation
+);
 
 module.exports = router;

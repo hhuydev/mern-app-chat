@@ -1,5 +1,6 @@
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
+const User = require("../models/User");
 const HttpError = require("../utils/http-error");
 
 class ConversationController {
@@ -41,19 +42,46 @@ class ConversationController {
       const conversation = await Conversation.find({
         members: { $all: [req.user._id.toString(), req.body.secondUserId] },
       });
-      res.status(200).send({ conversation });
+      cm, res.status(200).send({ conversation });
     } catch (error) {
       return next(new HttpError("System error", 500));
     }
   }
-  async addUserIntoConversation(req, res, next) {
+  async addUserToConversation(req, res, next) {
     try {
-      // const userInConversation = await Conversation.find({
-      //   members: { $in: [req.user._id.toString()] },
-      // });
-      // if(userInConversation)
+      const inviteUser = await User.findOne({ email: req.body.email });
+      const user = req.user;
+      if (!user) throw next(new HttpError("User not found", 404));
+      if (!inviteUser) throw next(new HttpError("Email not found", 404));
+      const findConversation = await Conversation.findById(
+        req.body.conversationId
+      );
+
+      if (!findConversation)
+        throw next(new HttpError("Conversation not found", 404));
+
+      let index = findConversation.members.findIndex(
+        (userId) => userId === inviteUser._id.toString()
+      );
+
+      if (index !== -1)
+        throw next(
+          new HttpError(
+            "User is participating conversation, can not invite",
+            400
+          )
+        );
+
+      findConversation.members.push(inviteUser._id.toString());
+
+      try {
+        await findConversation.save();
+      } catch (error) {
+        throw next(new HttpError("Can not invite friend to conversation", 404));
+      }
+      res.status(200).send({ message: "User participated conversation" });
     } catch (error) {
-      return next(new HttpError("System error", 500));
+      throw next(new HttpError("System error", 404));
     }
   }
 }
