@@ -20,5 +20,10 @@ router.post(
   auth,
   conversationController.addUserToConversation
 );
+router.delete(
+  "/leave-conversation",
+  auth,
+  conversationController.leavingConversation
+);
 
 module.exports = router;

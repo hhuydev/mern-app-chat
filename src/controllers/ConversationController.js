@@ -81,7 +81,30 @@ class ConversationController {
       }
       res.status(200).send({ message: "User participated conversation" });
     } catch (error) {
-      throw next(new HttpError("System error", 404));
+      throw next(new HttpError("System error", 500));
+    }
+  }
+
+  async leavingConversation(req, res, next) {
+    try {
+      if (!req.user) throw next(new HttpError("User not found!", 404));
+      const findConversation = await Conversation.findById(
+        req.body.conversationId
+      );
+      if (!findConversation)
+        throw next(new HttpError("Conversation not found", 404));
+      const updateConversationMembers = findConversation.members.filter(
+        (userId) => userId !== req.user._id.toString()
+      );
+      findConversation.members = updateConversationMembers;
+      try {
+        await findConversation.save();
+      } catch (error) {
+        throw next(new HttpError("Has an error when leave conversation", 500));
+      }
+      res.status(200).send({ message: "Leaved conversation" });
+    } catch (error) {
+      throw next(new HttpError("System error", 500));
     }
   }
 }
