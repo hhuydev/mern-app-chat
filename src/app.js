@@ -7,8 +7,12 @@ const fs = require("fs");
 const HttpError = require("./utils/http-error");
 
 const app = express();
+
 /**Cho phep client lay anh tu server */
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
+const publicDirectoryPath = path.join(__dirname, "../public");
+
+app.use(express.static(publicDirectoryPath));
 
 /**Handle CORS */
 app.use((req, res, next) => {
@@ -29,16 +33,20 @@ app.use(morgan("combined"));
 
 route(app);
 
+// app.get("/home", (req, res) => {
+//   res.sendFile(__dirname + "/index.html");
+// });
+
 app.use((req, res, next) => {
   throw new HttpError("Invalid route", 404);
 });
 
-// app.use((err, req, res, next) => {
-//   res.locals.error = err;
-//   if (err.status >= 100 && err.status < 600) res.status(err.status);
-//   else res.status(500);
-//   res.render("error");
-// });
+app.use((err, req, res, next) => {
+  res.locals.error = err;
+  if (err.status >= 100 && err.status < 600) res.status(err.status);
+  else res.status(500);
+  res.render("error");
+});
 
 /**Su dung middleware error default cho express cung cap khi co bat cu loi nao cac route */
 app.use((error, req, res, next) => {
