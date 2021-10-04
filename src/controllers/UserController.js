@@ -1,12 +1,13 @@
 const User = require("../models/User");
 const HttpError = require("../utils/http-error");
 const jwt = require("jsonwebtoken");
+const { sendCancleEmail, sendWelcomeEmail } = require("../utils/send-mail");
 
 class UserController {
   async signUp(req, res, next) {
     try {
-      const { email } = req.body;
-
+      const { email, username } = req.body;
+      console.log(email, username);
       let findExistingUser = await User.findOne({ email });
       if (findExistingUser)
         return next(new HttpError("User existing. Please login instead", 422));
@@ -29,7 +30,7 @@ class UserController {
         } catch (error) {
           return next(new HttpError("Can not generate token", 500));
         }
-
+        sendWelcomeEmail(email, username);
         res.status(201).send({ newUser, token });
       }
     } catch (error) {
@@ -65,7 +66,7 @@ class UserController {
         return next(new HttpError("Can not generate token", 500));
       }
 
-      res.status(200).send({ userLogin, token });
+      res.status(200).send({ user: userLogin, token });
     } catch (error) {
       return next(new HttpError("Server error", 500));
     }
@@ -121,6 +122,7 @@ class UserController {
         message: "Delete user success",
         deleteUser,
       });
+      sendCancleEmail(deleteUser.email, deleteUser.username);
     } catch (error) {
       return next(new HttpError("Server error", 500));
     }
