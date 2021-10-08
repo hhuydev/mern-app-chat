@@ -31,7 +31,20 @@ class MessageController {
         return next(new HttpError("Can not get messages in conversation", 400));
       res.status(200).send({ messages });
     } catch (error) {
-      res.status(500).send(error);
+      return next(new HttpError("Error system", 500));
+    }
+  }
+
+  async getLatestMessage(req, res, next) {
+    try {
+      const getLatestMessage = await Message.find()
+        .sort({ createdAt: -1 })
+        .limit(1);
+      if (!getLatestMessage)
+        return next(new HttpError("Can not get latest messages by roomid"));
+      res.status(200).send({ latestMessage: getLatestMessage });
+    } catch (error) {
+      return next(new HttpError("Error system", 500));
     }
   }
 }

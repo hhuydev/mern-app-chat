@@ -1,6 +1,7 @@
 const app = require("./app");
 const http = require("http").Server(app);
 const jwt = require("jsonwebtoken");
+const auth = require("./middleware/auth");
 
 const port = process.env.PORT || 5000;
 
@@ -18,21 +19,28 @@ const io = require("socket.io")(server, {
   },
 });
 
-//Auth by socket.io
-io.use(async (socket, next) => {
-  try {
-    const token = socket.handshake.query.token;
-    console.log(token);
-    // const payload = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-    // socket.userId = payload.id;
+io.use((socket, next) => {
+  // if (socket.handshake.query && socket.handshake.query.token) {
+  //   jwt.verify(
+  //     socket.handshake.query.token,
+  //     process.env.JWT_SECRET_KEY,
+  //     function (err, decoded) {
+  //       if (err) return next(new Error("Authentication error"));
+  //       socket.decoded = decoded;
+  //       next();
+  //     }
+  //   );
+  if (socket.req) {
+    console.log(socket.req);
     next();
-  } catch (err) {}
-});
-
-io.on("connection", (socket) => {
-  console.log("Connected: " + socket.handshake.query.token);
+  } else {
+    next(new Error("Authentication error"));
+  }
+}).on("connection", function (socket) {
+  // Connection now authenticated to receive further events
+  console.log("Connected: " + req.user);
   socket.on("disconnect", () => {
-    console.log("Disconnected: " + socket.userId);
+    console.log("Disconnected: " + socket.id);
   });
   socket.on("chat message", (msg) => {
     io.emit("chat message", msg);
