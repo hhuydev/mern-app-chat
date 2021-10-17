@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const HttpError = require("../utils/http-error");
 const jwt = require("jsonwebtoken");
-const { sendCancleEmail, sendWelcomeEmail } = require("../utils/send-mail");
+const { sendWelcomeEmail, sendCancleEmail } = require("../utils/send-mail");
 
 class UserController {
   async signUp(req, res, next) {
