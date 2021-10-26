@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
 const HttpError = require("./utils/http-error");
+const cors = require("cors");
 
 const app = express();
 
@@ -21,10 +22,17 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
+
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
 
   next();
 });
+// app.use(cors());
+
+// res.setHeader(
+//   "Access-Control-Allow-Headers",
+//   "Origin, OPTIONS, Accept, Authorization, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+// );
 
 /**config = middleware */
 app.use(express.json());

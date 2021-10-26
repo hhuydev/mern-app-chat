@@ -1,88 +1,70 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Demo Socket.IO on Browser</title>
-    <style>
-      body {
-        margin: 0;
-        padding-bottom: 3rem;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
-      }
+    <title>Awesome Login Page trungquandev</title>
 
-      #form {
-        background: rgba(0, 0, 0, 0.15);
-        padding: 0.25rem;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        height: 3rem;
-        box-sizing: border-box;
-        backdrop-filter: blur(10px);
-      }
-      #input {
-        border: none;
-        padding: 0 1rem;
-        flex-grow: 1;
-        border-radius: 2rem;
-        margin: 0.25rem;
-      }
-      #input:focus {
-        outline: none;
-      }
-      #form > button {
-        background: #333;
-        border: none;
-        padding: 0 1rem;
-        margin: 0.25rem;
-        border-radius: 3px;
-        outline: none;
-        color: #fff;
-      }
-
-      #messages {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      #messages > li {
-        padding: 0.5rem 1rem;
-      }
-      #messages > li:nth-child(odd) {
-        background: #efefef;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+      integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@9.17.1/dist/sweetalert2.min.css"
+      integrity="sha256-KpQHAI/AubL4JrO3VYskOgqSm+Z9nzrIqWB1dTOfCK4="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
+
   <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="/socket.io/socket.io.js"></script>
+    <div class="container h-100">
+      <div class="d-flex justify-content-center h-100">
+        <div class="user_card">
+          <div class="d-flex justify-content-center">
+            <div class="brand_logo_container">
+              <a href="https://trungquandev.com" target="_blank">
+                <img
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7opZvfzQMOmt6svSBdypoOyK_fXmDKq7snA&usqp=CAU"
+                  class="brand_logo"
+                  alt="Logo"
+                />
+              </a>
+            </div>
+          </div>
 
-    <script>
-      var socket = io();
+          <div class="mb-2 trungquandev-author-info">
+            <div class="info-content text-center">
+              <h5>Node.js Two-Factor Authentication (2FA)</h5>
+            </div>
+            <hr />
+          </div>
+          <div class="d-flex justify-content-center link_container">
+            <a class="btn link_btn text-left" href="/login.html"
+              ><em><u>Step 01:</u>&nbsp;</em> Link to Login Page</a
+            >
+          </div>
+          <div class="d-flex justify-content-center link_container">
+            <a class="btn link_btn text-left" href="/trangchu.html"
+              ><em><u>Step 02:</u>&nbsp;</em> Link to Enable 2FA Page</a
+            >
+          </div>
 
-      var messages = document.getElementById("messages");
-      var form = document.getElementById("form");
-      var input = document.getElementById("input");
-
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (input.value) {
-          socket.emit("chat message", input.value);
-          input.value = "";
-        }
-      });
-
-      socket.on("chat message", function (msg) {
-        var item = document.createElement("li");
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-    </script>
+          <div class="d-flex justify-content-center link_container">
+            <a class="btn link_btn text-left" href="/enable-2fa.html"
+              ><em><u>Step 03:</u>&nbsp;</em> Link to Verify 2FA Page</a
+            >
+          </div>
+          <div class="offset-height"></div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

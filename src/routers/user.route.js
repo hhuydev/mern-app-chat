@@ -22,4 +22,8 @@ router.post(
 
 router.delete("/me/delete-avatar", auth, userController.deleteAvatar);
 
+router.post("/enable-2fa", auth, userController.postEnable2FA);
+
+router.post("/verify-2fa", auth, userController.postverify2FA);
+
 module.exports = router;

@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    secret: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
@@ -69,7 +73,7 @@ userSchema.methods.generateAuthToken = async function (next) {
   let token;
   try {
     token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: user.email, username: user.username },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "1h" }
     );

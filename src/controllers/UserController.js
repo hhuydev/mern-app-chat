@@ -2,6 +2,12 @@ const User = require("../models/User");
 const HttpError = require("../utils/http-error");
 const jwt = require("jsonwebtoken");
 const { sendWelcomeEmail, sendCancleEmail } = require("../utils/send-mail");
+const {
+  generateOTPToken,
+  generateQRCode,
+  generateUniqueSecret,
+  verifyOTPToken,
+} = require("../utils/2fa");
 
 class UserController {
   async signUp(req, res, next) {
@@ -14,6 +20,7 @@ class UserController {
       else {
         const newUser = new User(req.body);
         newUser.isOnline = true;
+        newUser.secret = generateUniqueSecret();
         try {
           await newUser.save();
         } catch (error) {
@@ -66,7 +73,9 @@ class UserController {
         return next(new HttpError("Can not generate token", 500));
       }
 
-      res.status(200).send({ user: userLogin, token });
+      res
+        .status(200)
+        .send({ user: userLogin, token, isCorrectIdentifier: true });
     } catch (error) {
       return next(new HttpError("Server error", 500));
     }
@@ -163,6 +172,31 @@ class UserController {
         return next(new HttpError("Can not delete avatar, try again!", 500));
       }
       res.status(200).send({ message: "Delete avatar success", user });
+    } catch (error) {
+      return next(new HttpError("Server error", 500));
+    }
+  }
+
+  async postEnable2FA(req, res, next) {
+    try {
+      const user = req.user;
+      const serviceName = "AloAlo App Chat";
+      const otpAuth = generateOTPToken(user.username, serviceName, user.secret);
+      const QRCodeImage = await generateQRCode(otpAuth);
+      res.status(200).send({ QRCodeImage });
+    } catch (error) {
+      return next(new HttpError("Server error", 500));
+    }
+  }
+
+  async postverify2FA(req, res, next) {
+    try {
+      const user = req.user;
+      if (!user) return next(new HttpError("User not found!", 404));
+      const { otpToken } = req.body;
+      if (!otpToken) return next(new HttpError("Can not get otp token!", 404));
+      const isValid = verifyOTPToken(otpToken, user.secret);
+      res.status(200).send({ isValid });
     } catch (error) {
       return next(new HttpError("Server error", 500));
     }
