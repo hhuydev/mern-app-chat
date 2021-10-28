@@ -15,7 +15,11 @@ const {
   getUserInRoom,
 } = require("./utils/users");
 
-const { generateMessage, generateLocationMessage } = require("./utils/message");
+const {
+  generateMessage,
+  generateLocationMessage,
+  welcomeMessage,
+} = require("./utils/message");
 
 const io = require("socket.io")(server, {
   allowEIO3: true,
@@ -60,13 +64,13 @@ io.use(function (socket, next) {
       // socket.join(user.room);
       socket.join(room);
       /**Gửi cho tat ca client*/
-      socket.emit("message", generateMessage("Admin", "Welcome!"));
+      socket.emit("message", welcomeMessage("Admin", "Welcome!"));
       /**Gửi cho tất cả client trừ người gửi sẽ k thấy dc trong room*/
       socket.broadcast
         .to(room)
         .emit(
           "message",
-          generateMessage("Admin", `${user.username} has joined!`)
+          welcomeMessage("Admin", `${user.username} has joined!`)
         );
       io.to(room).emit("roomData", {
         room,
@@ -76,11 +80,15 @@ io.use(function (socket, next) {
     })
     .on("sendMessage", async (text, callback) => {
       // const user = getUser(socket.id);
-      const { user, savedRoom } = await getUser(socket.decoded.userId);
+      const { user, savedRoomName } = await getUser(socket.decoded.userId);
       // const filter = new Filter();
       // if (filter.isProfane(text)) return callback("Profane is not allowed!");
       /**Gửi cho tất cả client & người gửi trong room*/
-      io.to(savedRoom).emit("message", generateMessage(user.username, text));
+      io.to(savedRoomName).emit(
+        "message",
+        // generateMessage(user.username, text)
+        generateMessage(user.username, text)
+      );
       callback();
     })
     .on("disconnect", async () => {

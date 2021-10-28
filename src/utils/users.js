@@ -1,28 +1,20 @@
 const User = require("../models/User");
 const HttpError = require("./http-error");
-const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 const ObjectId = require("mongodb").ObjectId;
 const users = [];
 
-const validateToken = async (token) => {
-  try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const user = await User.findById(decodedToken.userId);
-  } catch (error) {}
-};
-let savedRoom;
+let savedRoomName;
 const addUser = async ({ id, userId, room }) => {
   try {
     /**validate data */
 
-    let user = await User.findById(new ObjectId(userId));
+    let user = await User.findById(userId);
 
     if (!user) return { error: "Not found user" };
 
     let username = user.username;
     room = room.trim().toLowerCase();
-    savedRoom = room;
+    savedRoomName = room;
     if (!username || !room) return { error: "Username & room are required!" };
 
     /**kiem tra thong user ton tai trong room chua */
@@ -55,7 +47,7 @@ const getUser = async (id) => {
   // else return undefined;
   const user = await User.findById(id);
   if (!user) return undefined;
-  else return { user, savedRoom };
+  else return { user, savedRoomName };
 };
 
 const getUserInRoom = (roomName) => {

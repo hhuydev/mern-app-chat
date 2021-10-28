@@ -62,7 +62,7 @@ socket.on("message", (message) => {
   autoscroll();
 });
 
-$messageForm.addEventListener("submit", (e) => {
+$messageForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   $messageFormButton.setAttribute("disabled", "disabled");
   /**get gia tri input bang thuoc tinh name trong form */
@@ -75,6 +75,7 @@ $messageForm.addEventListener("submit", (e) => {
     if (!mytext) return;
     // else console.log(mytext);
   });
+  await saveMessage(mytext, "617abf93f123a04d19c88116");
 });
 
 // socket.on("updatedText", (message) => {
@@ -121,3 +122,23 @@ socket.emit("join", { username, room }, (err) => {
     location.href = "/";
   }
 });
+
+const saveMessage = async (text, conversationId) => {
+  try {
+    const result = await axios.post(
+      "http://localhost:5000/api/messages/create-message",
+      {
+        conversationId,
+        text,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+      }
+    );
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};

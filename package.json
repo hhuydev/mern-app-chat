@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "dev": "env-cmd -f ./config/dev.env nodemon --inspect src/index.js -e js",
+    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js -e js",
     "format": "prettier --single-quote --trailing-comma all --tab-width 4 --write src/**/*.{js,json,scss}"
   },
   "husky": {

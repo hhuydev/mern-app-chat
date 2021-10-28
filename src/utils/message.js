@@ -13,7 +13,16 @@ const generateLocationMessage = (username, url) => {
     createdAt: new Date().getTime(),
   };
 };
+
+const welcomeMessage = (username, text) => {
+  return {
+    username,
+    text,
+    createdAt: new Date().getTime(),
+  };
+};
 module.exports = {
   generateMessage,
   generateLocationMessage,
+  welcomeMessage,
 };
