@@ -7,14 +7,19 @@ let save_sender;
 class FriendsController {
     async sendFriendRequest(req, res, next) {
         try {
+            console.log(req.body);
             const sender = req.user;
-            const receiver = await User.findById(req.body.receiverId);
-
+            const { email } = req.body;
+            //   const receiverById = await User.findById(req.body.receiverId.toString());
+            const receiverByMail = await User.findOne({ email });
             if (!sender) return next(new HttpError('User not found!', 404));
-            if (!receiver)
+            if (!receiverByMail)
                 return next(new HttpError('Receiver not found!', 404));
 
-            if (req.user._id.toString() === req.body.receiverId)
+            if (
+                // req.user._id.toString() === req.body.receiverId ||
+                req.user.email === req.body.email
+            )
                 return next(
                     new HttpError(
                         'You can not send request friend by yourself!',
@@ -24,11 +29,11 @@ class FriendsController {
 
             const findExistingFriend = await Friends.findOne({
                 senderId: req.user._id.toString(),
-                friend: req.body.receiverId,
+                friend: req.body.email,
             });
 
             const findExistingFriend_2 = await Friends.findOne({
-                senderId: req.body.receiverId,
+                senderId: req.body.email,
                 friend: req.user._id.toString(),
             });
             if (findExistingFriend || findExistingFriend_2)
@@ -41,7 +46,7 @@ class FriendsController {
             const findExistingFriendRequest = await FriendRequestStatus.findOne(
                 {
                     senderId: req.user._id,
-                    receiverId: req.body.receiverId,
+                    receiverId: req.body.email,
                     status: 'WAITING',
                 },
             );
@@ -52,7 +57,7 @@ class FriendsController {
 
             const sendFriendRequest = new FriendRequestStatus({
                 senderId: req.user._id,
-                receiverId: req.body.receiverId,
+                receiverId: req.body.email,
                 status: 'WAITING',
             });
 
@@ -71,10 +76,10 @@ class FriendsController {
             const receiver = req.user;
             if (!receiver) return next(new HttpError('User not found', 404));
             const findFriendRequest = await FriendRequestStatus.findOne({
-                receiverId: receiver._id,
+                receiverId: receiver.email,
             });
             if (!findFriendRequest) {
-                return next(new HttpError('You have not friend request', 400));
+                return next(new HttpError('You have not friend request', 200));
             }
             const findSentFriendRequest = await FriendRequestStatus.findOne({
                 receiverId: receiver._id,

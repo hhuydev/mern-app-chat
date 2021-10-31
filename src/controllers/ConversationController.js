@@ -26,8 +26,20 @@ class ConversationController {
         }
     }
     async createConversation(req, res, next) {
+        const findUser = await User.findOne({ email: req.body.email });
+        if (!findUser) return next(new HttpError('User not found', 400));
+        const existingNameConversation = await Conversation.findOne({
+            name: req.body.name,
+        });
+        if (existingNameConversation)
+            return next(
+                new HttpError(
+                    'Conversation name is in use, please choose another name',
+                    400,
+                ),
+            );
         const newConversation = new Conversation({
-            members: [req.user._id.toString(), req.body.receiverId],
+            members: [req.user._id.toString(), findUser._id.toString()],
             name: req.body.name,
         });
         try {
@@ -83,7 +95,7 @@ class ConversationController {
                     new HttpError('Can not invite friend to conversation', 404),
                 );
             }
-            res.status(200).send({ message: 'User participated conversation' });
+            res.status(200).send({ message: 'Join success' });
         } catch (error) {
             throw next(new HttpError('System error', 500));
         }
