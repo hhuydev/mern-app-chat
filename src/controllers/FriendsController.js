@@ -106,9 +106,24 @@ class FriendsController {
         try {
             const user = req.user;
             if (!user) return next(new HttpError('User not found!', 404));
+            //   const listFriend = await Friends.find({
+            //     $or: [{ senderId: user._id }, { friend: user._id }],
+            //   });
             const listFriend = await Friends.find({
                 $or: [{ senderId: user._id }, { friend: user._id }],
             });
+
+            //   const users = await User.find({});
+            //   const friends = users.filter(
+            //     (user, index) =>
+            //       user._id.toString() === listFriend[index].senderId ||
+            //       user._id.toString() === listFriend[index].friend
+            //   );
+            //   const list = users.filter(
+            //     (user, index) => user._id.toString() === friends[index].senderId
+            //   );
+            //   console.log(list);
+            //   console.log(friends);
             res.status(200).send({ listFriend });
         } catch (error) {
             return next(new HttpError('Server error', 500));

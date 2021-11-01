@@ -1,6 +1,7 @@
 const Message = require('../models/Message');
 const HttpError = require('../utils/http-error');
 const Conversation = require('../models/Conversation');
+const User = require('../models/User');
 
 class MessageController {
     async createMessage(req, res, next) {
@@ -49,14 +50,31 @@ class MessageController {
 
     async getLatestMessage(req, res, next) {
         try {
-            const getLatestMessage = await Message.find()
-                .sort({ createdAt: -1 })
-                .limit(1);
-            if (!getLatestMessage)
+            const conversations = await Conversation.find({});
+            const checkUserInConversation = conversations.forEach(
+                (conver, index) =>
+                    conver.members[index].toString() ===
+                    req.user._id.toString(),
+            );
+            if (checkUserInConversation !== -1) {
+                const getLatestMessage = await Message.find({
+                    conversationId: req.body.conversationId,
+                })
+                    .sort({ createdAt: -1 })
+                    .limit(1);
+                if (!getLatestMessage)
+                    return next(
+                        new HttpError('Can not get latest messages by roomid'),
+                    );
+                res.status(200).send({ latestMessage: getLatestMessage });
+            } else {
                 return next(
-                    new HttpError('Can not get latest messages by roomid'),
+                    new HttpError(
+                        'You have not paticipated in this conversation',
+                        400,
+                    ),
                 );
-            res.status(200).send({ latestMessage: getLatestMessage });
+            }
         } catch (error) {
             return next(new HttpError('Error system', 500));
         }

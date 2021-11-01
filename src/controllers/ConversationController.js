@@ -39,7 +39,7 @@ class ConversationController {
                 ),
             );
         const newConversation = new Conversation({
-            members: [req.user._id.toString(), findUser._id.toString()],
+            members: [req.user._id.toString()],
             name: req.body.name,
         });
         try {
