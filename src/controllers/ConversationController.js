@@ -6,28 +6,52 @@ const HttpError = require('../utils/http-error');
 class ConversationController {
     async getConversations(req, res, next) {
         try {
-            const conversations = await Conversation.find({
-                members: { $in: [req.user._id.toString()] },
+            // const conversations = await Conversation.find({
+            //   members: { $elemMatch: { $in: [req.user._id.toString()] } },
+            // });
+            // const conversations = await Conversation.find({
+            //   // members: { $in: [req.user._id.toString()] },
+            // });
+            const conversations = await Conversation.find()
+                .where('members')
+                .exists({
+                    username: req.user.username,
+                    _id: req.user._id.toString(),
+                });
+            console.log(conversations);
+            const filterConversations = conversations.filter((conver) => {
+                // console.log(conver);
+                return conver.members.filter(
+                    (mem) =>
+                        mem.username.toString() ===
+                        req.user.username.toString(),
+                );
             });
+            // const filterConversations = conversations.filter((conver, index) => {
+            //   console.log(conver);
+            //   return conver.members._id.toString() === req.user._id.toString();
+            // });
+
+            // console.log(filterConversations);
             if (!conversations)
                 return next(
                     new HttpError('Can not load conversations, try again', 500),
                 );
-            if (conversations.length === 0)
+            if (filterConversations.length === 0)
                 return next(
                     new HttpError(
                         "You have not created conversation yet, let's create a conversation",
                         500,
                     ),
                 );
-            res.status(200).send({ conversations });
+            res.status(200).send({ conversations: filterConversations });
         } catch (error) {
             return next(new HttpError('System error', 500));
         }
     }
     async createConversation(req, res, next) {
-        const findUser = await User.findOne({ email: req.body.email });
-        if (!findUser) return next(new HttpError('User not found', 400));
+        // const findUser = await User.findOne({ email: req.body.email });
+        // if (!findUser) return next(new HttpError('User not found', 400));
         const existingNameConversation = await Conversation.findOne({
             name: req.body.name,
         });
@@ -39,7 +63,7 @@ class ConversationController {
                 ),
             );
         const newConversation = new Conversation({
-            members: [req.user._id.toString()],
+            members: [req.user],
             name: req.body.name,
         });
         try {
@@ -86,7 +110,7 @@ class ConversationController {
                     ),
                 );
 
-            findConversation.members.push(inviteUser._id.toString());
+            findConversation.members.push(inviteUser);
 
             try {
                 await findConversation.save();

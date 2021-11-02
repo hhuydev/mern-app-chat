@@ -51,6 +51,7 @@ class MessageController {
     async getLatestMessage(req, res, next) {
         try {
             const conversations = await Conversation.find({});
+            console.log(conversations);
             const checkUserInConversation = conversations.forEach(
                 (conver, index) =>
                     conver.members[index].toString() ===

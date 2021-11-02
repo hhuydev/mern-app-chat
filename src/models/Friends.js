@@ -2,12 +2,9 @@ const mongoose = require('mongoose');
 
 const FriendsSchema = new mongoose.Schema(
     {
-        senderId: {
-            type: String,
+        friends: {
+            type: [],
             required: true,
-        },
-        friend: {
-            type: String,
         },
     },
     { timestamps: true },

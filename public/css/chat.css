@@ -48,12 +48,12 @@ button {
 }
 
 button:hover {
-  background: #6b47b8;
+  background: #20bf6b;
 }
 
 button:disabled {
   cursor: default;
-  background: #7c5cbf94;
+  background: #1b9755;
 }
 
 /* Join Page Styles */

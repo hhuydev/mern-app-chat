@@ -16,7 +16,7 @@ input {
 
 body {
   line-height: 1.4;
-  color: #333333;
+  color: #60a3bc;
   font-family: Helvetica, Arial, sans-serif;
 }
 
@@ -40,7 +40,7 @@ input {
 button {
   cursor: pointer;
   padding: 12px;
-  background: #7c5cbf;
+  background: #20bf6b;
   border: none;
   color: white;
   font-size: 16px;
@@ -48,7 +48,7 @@ button {
 }
 
 button:hover {
-  background: #6b47b8;
+  background: #178b4d;
 }
 
 button:disabled {
@@ -59,7 +59,7 @@ button:disabled {
 /* Join Page Styles */
 
 .centered-form {
-  background: #333744;
+  background: #60a3bc;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -180,4 +180,18 @@ button:disabled {
   list-style-type: none;
   font-weight: 300;
   padding: 12px 24px 0 24px;
+}
+
+a {
+  text-decoration: none;
+  margin-left: 10px;
+  display: inline-block;
+  padding: 10px 20px;
+  background: #20bf6b;
+  color: #fff;
+  transition: background 0.3s ease;
+}
+
+a:hover {
+  background: #178b4d;
 }
