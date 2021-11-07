@@ -30,8 +30,8 @@ class AdminController {
                     findUserToLock.isLocked = true;
                     await findUserToLock.save();
                     res.status(200).send({
-                        message: 'Locked user',
-                        findUserToLock,
+                        message: 'Locked user account',
+                        user: findUserToLock,
                     });
                 } else {
                     return next(new HttpError('User account is locking', 400));
@@ -57,8 +57,8 @@ class AdminController {
                     findUserToUnLock.isLocked = false;
                     await findUserToUnLock.save();
                     res.status(200).send({
-                        message: 'Unlocked User Account success',
-                        findUserToUnLock,
+                        message: 'Unlocked user Account success',
+                        user: findUserToUnLock,
                     });
                 } else {
                     res.status(400).send({
@@ -86,8 +86,7 @@ class AdminController {
                 );
                 await deleteUser;
                 res.status(200).send({
-                    message: 'Delete user success',
-                    deleteUser,
+                    message: 'Delete user account success',
                 });
             } else
                 res.status(401).send({

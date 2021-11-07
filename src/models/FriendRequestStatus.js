@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const FriendRequestStatusSchema = new mongoose.Schema(
     {
         senderId: {
-            type: String,
+            type: Object,
             required: true,
         },
         receiverId: {
-            type: String,
+            type: Object,
             required: true,
         },
         status: {

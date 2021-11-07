@@ -10,7 +10,12 @@ router.post(
     auth,
     friendsController.acceptFriendRequest,
 );
-router.get('/get-my-list-friend', auth, friendsController.getListFriend);
+router.get(
+    '/get-list-friend-request',
+    auth,
+    friendsController.getListFriendsRequest,
+);
+router.get('/get-my-list-friend', auth, friendsController.getListFriends);
 router.delete('/delete-friend', auth, friendsController.deleteFriend);
 
 module.exports = router;

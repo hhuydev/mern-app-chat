@@ -40,7 +40,7 @@ class UserController {
                     return next(new HttpError('Can not generate token', 500));
                 }
                 sendWelcomeEmail(email, username);
-                res.status(201).send({ newUser, token });
+                res.status(201).send({ user: newUser, token });
             }
         } catch (error) {
             return next(new HttpError('Server error', 500));
@@ -125,7 +125,7 @@ class UserController {
 
             res.status(200).send({
                 message: 'Update user success',
-                updateUser,
+                user: updateUser,
             });
         } catch (error) {
             return next(new HttpError('Server error', 500));
@@ -140,7 +140,6 @@ class UserController {
             await req.user.remove();
             res.status(200).send({
                 message: 'Delete user success',
-                deleteUser,
             });
             sendCancleEmail(deleteUser.email, deleteUser.username);
         } catch (error) {
@@ -149,7 +148,7 @@ class UserController {
     }
 
     getUser(req, res, next) {
-        res.send(req.user);
+        res.send({ user: req.user });
     }
 
     async uploadAvatar(req, res, next) {
@@ -157,7 +156,13 @@ class UserController {
             const user = req.user;
             if (!user) return next(new HttpError('User not found!', 404));
             if (!req.file) return next(new HttpError('File not found!', 404));
-
+            if (user.avatar.length > 0)
+                return next(
+                    new HttpError(
+                        'Please delete avatar in use before upload new avatar!',
+                        400,
+                    ),
+                );
             user.avatar = req.file.path;
             try {
                 await user.save();
@@ -178,7 +183,7 @@ class UserController {
             if (!user) return next(new HttpError('User not found!', 404));
             if (user.avatar.length === 0)
                 return next(
-                    new HttpError('You have not uploaded avatar yet!', 404),
+                    new HttpError('You have not uploaded avatar yet!', 400),
                 );
             user.avatar = '';
             try {
@@ -188,7 +193,7 @@ class UserController {
                     new HttpError('Can not delete avatar, try again!', 500),
                 );
             }
-            res.status(200).send({ message: 'Delete avatar success', user });
+            res.status(200).send({ message: 'Delete avatar success' });
         } catch (error) {
             return next(new HttpError('Server error', 500));
         }
@@ -219,6 +224,16 @@ class UserController {
                 return next(new HttpError('Can not get otp token!', 404));
             const isValid = verifyOTPToken(otpToken, user.secret);
             res.status(200).send({ isValid });
+        } catch (error) {
+            return next(new HttpError('Server error', 500));
+        }
+    }
+
+    async searchUser(req, res, next) {
+        try {
+            const user = await User.findOne({ email: req.body.email });
+            if (!user) return next(new HttpError('User not found', 404));
+            res.send({ user });
         } catch (error) {
             return next(new HttpError('Server error', 500));
         }

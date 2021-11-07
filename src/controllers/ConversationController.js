@@ -6,31 +6,28 @@ const HttpError = require('../utils/http-error');
 class ConversationController {
     async getConversations(req, res, next) {
         try {
-            // const conversations = await Conversation.find({
-            //   members: { $elemMatch: { $in: [req.user._id.toString()] } },
-            // });
-            // const conversations = await Conversation.find({
-            //   // members: { $in: [req.user._id.toString()] },
-            // });
+            //   const conversations = await Conversation.find({
+            //     members: { $elemMatch: { $in: [req.user._id.toString()] } },
+            //   });
+            //   const conversations = await Conversation.find({
+            //     members: { $in: [req.user._id.toString()] },
+            //   });
             const conversations = await Conversation.find()
                 .where('members')
                 .exists({
-                    username: req.user.username,
                     _id: req.user._id.toString(),
                 });
             console.log(conversations);
             const filterConversations = conversations.filter((conver) => {
-                // console.log(conver);
                 return conver.members.filter(
                     (mem) =>
                         mem.username.toString() ===
                         req.user.username.toString(),
                 );
             });
-            // const filterConversations = conversations.filter((conver, index) => {
-            //   console.log(conver);
-            //   return conver.members._id.toString() === req.user._id.toString();
-            // });
+            //   const filterConversations = conversations.filter((conver, index) => {
+            //     return conver.members._id.toString() === req.user._id.toString();
+            //   });
 
             // console.log(filterConversations);
             if (!conversations)

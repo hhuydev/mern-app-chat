@@ -26,4 +26,6 @@ router.post('/enable-2fa', auth, userController.postEnable2FA);
 
 router.post('/verify-2fa', auth, userController.postverify2FA);
 
+router.get('/search-user', userController.searchUser);
+
 module.exports = router;
