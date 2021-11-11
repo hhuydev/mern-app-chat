@@ -33,9 +33,10 @@ class MessageController {
     }
 
     async getMessagesByConversation(req, res, next) {
+        console.log(req.params.conversationId);
         try {
             const messages = await Message.find({
-                conversationId: req.body.conversationId,
+                conversationId: req.params.conversationId,
             });
 
             if (messages.length === 0 || !messages)
@@ -50,32 +51,28 @@ class MessageController {
 
     async getLatestMessage(req, res, next) {
         try {
-            const conversations = await Conversation.find({});
-            console.log(conversations);
-            const checkUserInConversation = conversations.forEach(
-                (conver, index) =>
-                    conver.members[index].toString() ===
-                    req.user._id.toString(),
-            );
-            if (checkUserInConversation !== -1) {
-                const getLatestMessage = await Message.find({
-                    conversationId: req.body.conversationId,
-                })
-                    .sort({ createdAt: -1 })
-                    .limit(1);
-                if (!getLatestMessage)
-                    return next(
-                        new HttpError('Can not get latest messages by roomid'),
-                    );
-                res.status(200).send({ latestMessage: getLatestMessage });
-            } else {
+            // const conversations = await Conversation.find({});
+            // const checkUserInConversation = conversations.forEach(
+            //   (conver, index) =>
+            //     conver.members[index].toString() === req.user._id.toString()
+            // );
+            // console.log(checkUserInConversation);
+            // if (checkUserInConversation !== -1) {
+            const getLatestMessage = await Message.findOne({
+                conversationId: req.params.conversationId,
+            })
+                .sort({ createdAt: -1 })
+                .limit(1);
+            if (!getLatestMessage)
                 return next(
-                    new HttpError(
-                        'You have not paticipated in this conversation',
-                        400,
-                    ),
+                    new HttpError('Can not get latest messages by roomid'),
                 );
-            }
+            res.status(200).send({ latestMessage: getLatestMessage });
+            // } else {
+            //   return next(
+            //     new HttpError("You have not paticipated in this conversation", 400)
+            //   );
+            // }
         } catch (error) {
             return next(new HttpError('Error system', 500));
         }

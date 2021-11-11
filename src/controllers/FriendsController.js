@@ -120,20 +120,28 @@ class FriendsController {
     }
 
     async cancelFriendRequest(req, res, next) {
-        const receiver = req.user;
-        if (!receiver) return next(new HttpError('User not found!'));
-        const findfriendRequest = await FriendRequestStatus.find({
-            receiverId: receiver,
-            senderId: req.body.email,
-            status: 'WAITING',
-        });
-        if (!findfriendRequest)
-            return next(new HttpError('Friend request invalid!', 404));
         try {
-            findfriendRequest.status = 'CANCELED';
-            await findfriendRequest.save();
+            const receiver = req.user;
+            if (!receiver) return next(new HttpError('User not found!'));
+            const sender = await User.findOne({ email: req.body.email });
+            console.log(sender);
+            console.log(receiver);
+            const findfriendRequest = await FriendRequestStatus.findOne({
+                receiverId: receiver,
+                senderId: sender,
+                status: 'WAITING',
+            });
+            if (!findfriendRequest)
+                return next(new HttpError('Friend request invalid!', 404));
+            try {
+                findfriendRequest.status = 'CANCELED';
+                await findfriendRequest.save();
+            } catch (error) {
+                return next(new HttpError('Friend request invalid!', 404));
+            }
+            res.status(200).send({ message: 'Cancled friend request success' });
         } catch (error) {
-            return next(new HttpError('Friend request invalid!', 404));
+            return next(new HttpError('server error', 500));
         }
     }
 

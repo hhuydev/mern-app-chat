@@ -134,4 +134,38 @@ const sendCancleEmail = (email, name) => {
         });
 };
 
-module.exports = { sendWelcomeEmail, sendCancleEmail };
+const sendVerifyEmail = (email, token) => {
+    var params = {
+        Destination: {
+            ToAddresses: [
+                email,
+                /* more items */
+            ],
+        },
+        Message: {
+            /* required */
+            Body: {
+                /* required */
+                Text: {
+                    Charset: 'UTF-8',
+                    Data: `Mã xác thực của bạn: ${token}`,
+                },
+            },
+            Subject: {
+                Charset: 'UTF-8',
+                Data: 'Xác thực tài khoản',
+            },
+        },
+        Source: 'aloaloappchat@gmail.com' /* required */,
+    };
+    const sendPromise = sesAws.sendEmail(params).promise();
+    sendPromise
+        .then((data) => {
+            console.log('Send mail success');
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+};
+
+module.exports = { sendWelcomeEmail, sendCancleEmail, sendVerifyEmail };

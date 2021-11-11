@@ -53,10 +53,14 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        secret: {
-            type: String,
-            default: null,
-        },
+        // tokens: [
+        //   {
+        //     token: {
+        //       type: String,
+        //       required: true,
+        //     },
+        //   },
+        // ],
     },
     { timestamps: true },
 );

@@ -34,6 +34,8 @@ $(document).ready(() => {
           timer: 5000,
         }).then(() => {
           localStorage.setItem("userToken", result.data.token);
+          localStorage.setItem("secret", result.data.secret);
+
           // window.location.href = "/enable-2fa.html";
           window.location.href = "/enable-2fa.html";
         });

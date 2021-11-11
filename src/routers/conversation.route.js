@@ -20,10 +20,28 @@ router.post(
     auth,
     conversationController.addUserToConversation,
 );
-router.delete(
+router.post(
     '/leave-conversation',
     auth,
     conversationController.leavingConversation,
+);
+
+router.patch(
+    '/update-conversation-name',
+    auth,
+    conversationController.updateConversationName,
+);
+
+router.delete(
+    '/delete-conversation',
+    auth,
+    conversationController.deleteConversation,
+);
+
+router.patch(
+    '/change-conversation-owner',
+    auth,
+    conversationController.changeOwnerConversation,
 );
 
 module.exports = router;

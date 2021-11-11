@@ -24,8 +24,8 @@ router.delete('/me/delete-avatar', auth, userController.deleteAvatar);
 
 router.post('/enable-2fa', auth, userController.postEnable2FA);
 
-router.post('/verify-2fa', auth, userController.postverify2FA);
+router.post('/verify-2fa', auth, userController.postVerify2FA);
 
-router.get('/search-user', userController.searchUser);
+router.get('/search-user/:email', userController.searchUser);
 
 module.exports = router;

@@ -7,7 +7,7 @@ $(document).ready(() => {
       const data = "test";
       const result = await axios.post(
         "http://localhost:5000/api/users/enable-2fa",
-        data,
+        { secret: localStorage.getItem("secret") },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -17,11 +17,11 @@ $(document).ready(() => {
 
       console.log(result);
       // Nhận được kết quả thì hiển thị mã QR Code ra màn hình
-      $("#img-qr-code-area").html(result.data.QRCodeImage);
-      $(".offset-height").css("height", "0px");
+      // $("#img-qr-code-area").html(result.data.QRCodeImage);
+      // $(".offset-height").css("height", "0px");
       setTimeout(() => {
         window.location.href = "/verify-2fa.html";
-      }, 5000);
+      }, 3000);
     } catch (error) {
       console.log(error);
       Swal.fire({

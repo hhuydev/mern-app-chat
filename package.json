@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@sendgrid/mail": "^7.4.7",
     "aws-sdk": "^2.999.0",
     "bcrypt": "5.0.0",
     "cors": "^2.8.5",
@@ -17,12 +16,14 @@
     "sharp": "^0.29.1",
     "socket.io": "^4.2.0",
     "socketio-jwt": "^4.6.2",
+    "speakeasy": "^2.0.0",
     "uuid": "^8.3.2",
     "validator": "^13.6.0"
   },
   "scripts": {
     "start": "node src/index.js",
     "dev": "env-cmd -f ./config/dev.env nodemon src/index.js -e js",
+    "test": "env-cmd -f ./config/test.env jest --watch --runInBand",
     "format": "prettier --single-quote --trailing-comma all --tab-width 4 --write src/**/*.{js,json,scss}"
   },
   "husky": {
@@ -42,8 +43,10 @@
     "env-cmd": "^10.1.0",
     "eslint": "^7.32.0",
     "husky": "^7.0.2",
+    "jest": "^27.3.1",
     "lint-staged": "^11.1.2",
     "nodemon": "^2.0.12",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "supertest": "^6.1.6"
   }
 }

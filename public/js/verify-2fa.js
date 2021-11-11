@@ -6,7 +6,7 @@ $(document).ready(() => {
       // Gọi tới api kiểm tra mã OTP
       const result = await axios.post(
         "http://localhost:5000/api/users/verify-2fa",
-        { otpToken },
+        { otpToken, secret: localStorage.getItem("secret") },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,

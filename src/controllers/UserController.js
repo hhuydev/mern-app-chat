@@ -1,12 +1,18 @@
 const User = require('../models/User');
 const HttpError = require('../utils/http-error');
 const jwt = require('jsonwebtoken');
-const { sendWelcomeEmail, sendCancleEmail } = require('../utils/send-mail');
+const {
+    sendWelcomeEmail,
+    sendCancleEmail,
+    sendVerifyEmail,
+} = require('../utils/send-mail');
 const {
     generateOTPToken,
     generateQRCode,
     generateUniqueSecret,
     verifyOTPToken,
+    totpGenerate,
+    validateTotp,
 } = require('../utils/2fa');
 
 class UserController {
@@ -20,9 +26,12 @@ class UserController {
                     new HttpError('User existing. Please login instead', 422),
                 );
             else {
-                const newUser = new User(req.body);
+                const newUser = new User({
+                    ...req.body,
+                    avatar: 'https://iupac.org/wp-content/uploads/2018/05/default-avatar-300x300.png',
+                });
                 newUser.isOnline = true;
-                newUser.secret = generateUniqueSecret();
+                // newUser.secret = generateUniqueSecret();
                 try {
                     await newUser.save();
                 } catch (error) {
@@ -39,7 +48,7 @@ class UserController {
                 } catch (error) {
                     return next(new HttpError('Can not generate token', 500));
                 }
-                sendWelcomeEmail(email, username);
+                // sendWelcomeEmail(email, username);
                 res.status(201).send({ user: newUser, token });
             }
         } catch (error) {
@@ -78,10 +87,13 @@ class UserController {
                 return next(new HttpError('Can not generate token', 500));
             }
 
+            const secret = generateUniqueSecret();
+
             res.status(200).send({
                 user: userLogin,
                 token,
                 isCorrectIdentifier: true,
+                secret: secret.base32,
             });
         } catch (error) {
             return next(new HttpError('Server error', 500));
@@ -141,14 +153,14 @@ class UserController {
             res.status(200).send({
                 message: 'Delete user success',
             });
-            sendCancleEmail(deleteUser.email, deleteUser.username);
+            // sendCancleEmail(deleteUser.email, deleteUser.username);
         } catch (error) {
             return next(new HttpError('Server error', 500));
         }
     }
 
     getUser(req, res, next) {
-        res.send({ user: req.user });
+        res.status(200).send({ user: req.user });
     }
 
     async uploadAvatar(req, res, next) {
@@ -202,27 +214,27 @@ class UserController {
     async postEnable2FA(req, res, next) {
         try {
             const user = req.user;
-            const serviceName = 'AloAlo App Chat';
-            const otpAuth = generateOTPToken(
-                user.username,
-                serviceName,
-                user.secret,
-            );
-            const QRCodeImage = await generateQRCode(otpAuth);
-            res.status(200).send({ QRCodeImage });
+            //   const serviceName = "AloAlo App Chat";
+            //   const otpAuth = generateOTPToken(user.username, serviceName, user.secret);
+            //   const QRCodeImage = await generateQRCode(otpAuth);
+            const otpAuth2 = totpGenerate(req.body.secret);
+            // sendVerifyEmail(user.email, otpAuth2.token);
+            res.status(200).send({ otpAuth2 });
         } catch (error) {
             return next(new HttpError('Server error', 500));
         }
     }
 
-    async postverify2FA(req, res, next) {
+    async postVerify2FA(req, res, next) {
         try {
             const user = req.user;
             if (!user) return next(new HttpError('User not found!', 404));
             const { otpToken } = req.body;
             if (!otpToken)
                 return next(new HttpError('Can not get otp token!', 404));
-            const isValid = verifyOTPToken(otpToken, user.secret);
+            //   const isValid = verifyOTPToken(otpToken, user.secret);
+
+            const isValid = validateTotp(req.body.secret, otpToken);
             res.status(200).send({ isValid });
         } catch (error) {
             return next(new HttpError('Server error', 500));
@@ -231,7 +243,7 @@ class UserController {
 
     async searchUser(req, res, next) {
         try {
-            const user = await User.findOne({ email: req.body.email });
+            const user = await User.findOne({ email: req.params.email });
             if (!user) return next(new HttpError('User not found', 404));
             res.send({ user });
         } catch (error) {

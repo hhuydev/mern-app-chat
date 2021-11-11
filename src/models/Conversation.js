@@ -13,6 +13,16 @@ const ConversationSchema = new mongoose.Schema(
             type: [],
             required: true,
         },
+        owner: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: 'User',
+        },
+        isGroup: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     },
     { timestamps: true },
 );

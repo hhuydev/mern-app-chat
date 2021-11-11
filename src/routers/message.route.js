@@ -5,12 +5,12 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 router.get(
-    '/get-messages-by-conversation',
+    '/get-messages-by-conversation/:conversationId',
     auth,
     messageController.getMessagesByConversation,
 );
 router.get(
-    '/get-latest-message-by-conversation',
+    '/get-latest-message-by-conversation/:conversationId',
     auth,
     messageController.getLatestMessage,
 );

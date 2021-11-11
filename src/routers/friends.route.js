@@ -10,6 +10,11 @@ router.post(
     auth,
     friendsController.acceptFriendRequest,
 );
+router.post(
+    '/cancle-friend-request',
+    auth,
+    friendsController.cancelFriendRequest,
+);
 router.get(
     '/get-list-friend-request',
     auth,

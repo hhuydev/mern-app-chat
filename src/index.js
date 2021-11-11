@@ -60,7 +60,7 @@ io.use(function (socket, next) {
             socket.room = room;
             console.log(socket.room);
             if (!user) console.log('user not found');
-            if (error) return callback(error);
+            // if (error) return callback(error);
             /**socket ket noi room */
             // socket.join(user.room);
             socket.join(room);
@@ -76,8 +76,9 @@ io.use(function (socket, next) {
             io.to(room).emit('roomData', {
                 room,
                 users: getUserInRoom(room),
+                user,
             });
-            callback();
+            // callback();
         })
         .on('sendMessage', async (text, callback) => {
             // const user = getUser(socket.id);
@@ -92,7 +93,7 @@ io.use(function (socket, next) {
                 // generateMessage(user.username, text)
                 generateMessage(user.username, text),
             );
-            callback();
+            // callback();
         })
         .on('disconnect', async () => {
             // const user = removeUser(socket.id);

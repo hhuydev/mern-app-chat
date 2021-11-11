@@ -41,11 +41,12 @@ const socket = io
   .connect("http://localhost:5000", {
     query: { token: localStorage.getItem("userToken") },
   })
-  .on("roomData", ({ users, room }) => {
+  .on("roomData", ({ users, room, user }) => {
     const html = Mustache.render(sidebarTemplate, {
       users,
       room,
     });
+    console.log(user);
     document.querySelector("#sidebar").innerHTML = html;
   });
 
@@ -64,18 +65,19 @@ socket.on("message", (message) => {
 
 $messageForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  $messageFormButton.setAttribute("disabled", "disabled");
+  // $messageFormButton.setAttribute("disabled", "disabled");
   /**get gia tri input bang thuoc tinh name trong form */
   const mytext = e.target.textMessage.value;
   socket.emit("sendMessage", mytext, (error) => {
-    $messageFormButton.removeAttribute("disabled");
-    $messageFormInput.value = "";
-    $messageFormInput.focus();
-    if (error) return console.log(error);
+    // $messageFormButton.removeAttribute("disabled");
+
+    // if (error) return console.log(error);
     if (!mytext) return;
     // else console.log(mytext);
   });
-  await saveMessage(mytext, "617abf93f123a04d19c88116");
+  $messageFormInput.value = "";
+  $messageFormInput.focus();
+  await saveMessage(mytext, "6188cd91bb307eddf6af5134");
 });
 
 // socket.on("updatedText", (message) => {
