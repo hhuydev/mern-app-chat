@@ -8,16 +8,22 @@ const {
   conversation,
 } = require("./fixtures/dbTest");
 
-test("Should update valid user fields", async () => {
-  await req(app)
-    .patch("/api/conversations/get-conversations")
+beforeEach(setupDBTest);
+
+test("Should create a new conversation", async () => {
+  const res = await req(app)
+    .post("/api/conversations/create-conversation")
+    .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
+    .send({ name: "Test create a new conversation" })
+    .expect(201);
+  const conver = await Conversation.findById(res.body.newConversation._id);
+  expect(conver).not.toBeNull();
+});
+
+test("Should get list conversations", async () => {
+  const res = await req(app)
+    .get("/api/conversations/get-conversations")
     .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
     .expect(200);
-  //   const user = await User.findById(userOne._id);
-  //   const conversations = await Conversation.find({});
-  //   const findIndexUser = conversations.findIndex(
-  //     (conver, i) => conver.members[i] === user._id
-  //   );
-  //   if (findIndexUser !== -1) expect();
-  //   expect(findIndexUser).not(-1);
+  expect(res.body.length).not.toEqual(0);
 });

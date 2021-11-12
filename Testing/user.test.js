@@ -68,17 +68,25 @@ test("Should update valid user fields", async () => {
   await req(app)
     .patch("/api/users/me/update")
     .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
-    .send({ username: "huy" })
+    .send({ username: "ghuy" })
     .expect(200);
   const user = await User.findById(userOne._id);
-  expect(user.username).toEqual("huy");
+  expect(user.username).toEqual("ghuy");
 });
 
-// test("Should upload user img", async () => {
+// test("Should delete user avatar", async () => {
 //   await req(app)
-//     .post("/api/me/upload-avatar")
+//     .delete("/api/users/me/delete-avatar")
+//     .set("Authorization", `Bearer ${userTwo.tokens[0].token}`)
+//     .send()
+//     .expect(200);
+// });
+
+// test("Should upload user avatar", async () => {
+//   await req(app)
+//     .post("/api/users/me/upload-avatar")
 //     .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
-//     .attach("uploads/images", "Testing/fixtures/profile-pic.jpg")
+//     .attach("avatar", "Testing/fixtures/profile-pic.jpg")
 //     .expect(200);
 //   const user = await User.findById(userOne._id);
 //   /**So sánh reference type trong jest */
