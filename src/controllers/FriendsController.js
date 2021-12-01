@@ -174,10 +174,32 @@ class FriendsController {
             const user = req.user;
             if (!user) return next(new HttpError('User not found!', 404));
 
-            const listFriends = await FriendRequestStatus.find({
-                status: 'ACCEPTED',
-                $or: [{ senderId: user }, { receiverId: user }],
-            });
+            // const listFriends = await FriendRequestStatus.find({
+            //   $or: [{ receiverId: user }, { senderId: user }, { status: "ACCEPTED" }],
+            // });
+            const allFriends = await Friends.find({});
+            const lFriends = allFriends.filter((f) =>
+                f.friends.some((id, i) => id === user._id.toString()),
+            );
+
+            let temp = [];
+            const friends = lFriends.filter((f) => temp.push(f.friends));
+
+            let temp2 = [];
+            temp = temp.filter((item) =>
+                item.some((id, index) =>
+                    id.toString() !== req.user._id.toString()
+                        ? temp2.push(id)
+                        : '',
+                ),
+            );
+            const listFriends = await Promise.all(
+                temp2.map((id) => {
+                    return User.findById(id);
+                }),
+            );
+            if (!listFriends)
+                return next(new HttpError('can not get list friends', 500));
             res.status(200).send({ listFriends });
         } catch (error) {
             return next(new HttpError('Server error', 500));
@@ -192,46 +214,29 @@ class FriendsController {
 
             if (!friend) return next(new HttpError('Friend not found!', 404));
 
-            const findExistingFriends = await Friends.find({
-                senderId: sender._id,
+            const findExistingFriendDelete = await Friends.find({
+                friends: {
+                    $in: [sender._id.toString(), friend._id.toString()],
+                },
             });
-            const findExistingFriend = findExistingFriends.filter(
-                (f) => f.friend === req.body.friendId,
+            console.log(findExistingFriendDelete);
+            const filterFriendDelete = findExistingFriendDelete.find(
+                (lstFriends) =>
+                    lstFriends.friends.some(
+                        (id) => id === friend._id.toString(),
+                    ),
             );
-            if (findExistingFriend.length > 0) {
-                const findFriend = await Friends.findOne({
-                    friend: req.body.friendId,
-                });
-
-                const findFriendRequestDelete =
-                    await FriendRequestStatus.findOne({
-                        $or: [{ senderId: sender }, { receiverId: sender }],
-                        status: 'ACCEPTED',
-                    });
-                if (!findFriendRequestDelete)
-                    return next(new HttpError('request friend invalid', 404));
-                findFriendRequestDelete.status = 'CANCELED';
-
+            // console.log(filterFriendDelete);
+            if (filterFriendDelete) {
                 try {
-                    await findFriendRequestDelete.save();
+                    await Friends.findOneAndDelete({
+                        _id: filterFriendDelete._id,
+                    });
                 } catch (error) {
-                    return next(
-                        new HttpError(
-                            'unsuccess update friend request status',
-                            500,
-                        ),
-                    );
+                    return new HttpError('Unfriend unsuccess', 500);
                 }
-                // const friends = await Friends.findByIdAndDelete();
-                // try {
-                //   await friends.save();
-                // } catch (error) {
-                //   return next(new HttpError("unsuccess delete friend", 500));
-                // }
 
                 res.status(200).send({ message: 'Unfriend success' });
-            } else {
-                return next(new HttpError('user not on your list friend', 400));
             }
         } catch (error) {
             return next(new HttpError('Server error', 500));

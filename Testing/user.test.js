@@ -82,15 +82,15 @@ test("Should update valid user fields", async () => {
 //     .expect(200);
 // });
 
-// test("Should upload user avatar", async () => {
-//   await req(app)
-//     .post("/api/users/me/upload-avatar")
-//     .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
-//     .attach("avatar", "Testing/fixtures/profile-pic.jpg")
-//     .expect(200);
-//   const user = await User.findById(userOne._id);
-//   /**So sánh reference type trong jest */
-//   // expect({}).toEqual({});
+test("Should upload user avatar", async () => {
+  await req(app)
+    .post("/api/users/me/upload-avatar")
+    .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
+    .attach("avatar", "Testing/fixtures/profile-pic.jpg")
+    .expect(200);
+  const user = await User.findById(userOne._id);
+  /**So sánh reference type trong jest */
+  // expect({}).toEqual({});
 
-//   expect(user.avatar).toEqual(expect.any(String));
-// });
+  expect(user.avatar).toEqual(expect.any(String));
+});

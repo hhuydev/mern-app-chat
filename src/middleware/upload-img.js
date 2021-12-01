@@ -5,6 +5,7 @@ const MIME_TYPE_MAP = {
     'image/png': 'png',
     'image/jpeg': 'jpeg',
     'image/jpg': 'jpg',
+    'multipart/form-data': 'multipart/form-data',
 };
 
 const fileUpload = multer({
@@ -15,7 +16,7 @@ const fileUpload = multer({
         },
         filename: (req, file, cb) => {
             const ext = MIME_TYPE_MAP[file.mimetype];
-            cb(null, uuidv4() + '.' + ext);
+            cb(null, file.originalname);
         },
     }),
     fileFilter: (req, file, cb) => {

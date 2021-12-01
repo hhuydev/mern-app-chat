@@ -1,7 +1,15 @@
-const generateMessage = (username, message) => {
+const generateMessage = (user, message) => {
     return {
-        username,
+        user,
         text: message,
+        createdAt: new Date().getTime(),
+    };
+};
+
+const generateFileMessage = (user, message) => {
+    return {
+        user,
+        file: message,
         createdAt: new Date().getTime(),
     };
 };
@@ -25,4 +33,5 @@ module.exports = {
     generateMessage,
     generateLocationMessage,
     welcomeMessage,
+    generateFileMessage,
 };

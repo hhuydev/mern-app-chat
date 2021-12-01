@@ -4,6 +4,7 @@ const main__chat__window = document.getElementById("main__chat__window");
 const videoGrid = document.getElementById("video-grid");
 const leaveVideoCall = document.getElementById("leave-meeting");
 const myVideo = document.createElement("video");
+const socket = io("/");
 myVideo.muted = true;
 
 var peer = new Peer(undefined, {
@@ -29,12 +30,18 @@ navigator.mediaDevices
     addVideoStream(myVideo, stream);
 
     peer.on("call", (call) => {
+      console.log("1");
       call.answer(stream);
       const video = document.createElement("video");
 
       call.on("stream", (userVideoStream) => {
+        console.log("2");
+
         addVideoStream(video, userVideoStream);
       });
+    });
+    socket.on("user-connected", (userId) => {
+      connectToNewUser(userId, stream);
     });
   });
 
@@ -61,6 +68,7 @@ peer.on("open", (id) => {
 // CHAT
 
 const connectToNewUser = (userId, streams) => {
+  console.log(userId);
   var call = peer.call(userId, streams);
   console.log(call);
   var video = document.createElement("video");
@@ -136,3 +144,88 @@ const setMuteButton = () => {
   <span>Mute</span>`;
   document.getElementById("muteButton").innerHTML = html;
 };
+
+// let localVideo = document.getElementById("local-video");
+// let remoteVideo = document.getElementById("remote-video");
+
+// localVideo.style.opacity = 0;
+// remoteVideo.style.opacity = 0;
+
+// localVideo.onplaying = () => {
+//   localVideo.style.opacity = 1;
+// };
+// remoteVideo.onplaying = () => {
+//   remoteVideo.style.opacity = 1;
+// };
+
+// let peer;
+// function init(userId) {
+//   peer = new Peer(userId, {
+//     path: "/peerjs",
+//     host: "/",
+//     port: "3030",
+//   });
+
+//   listen();
+// }
+
+// let localStream;
+// function listen() {
+//   peer.on("call", (call) => {
+//     navigator.getUserMedia(
+//       {
+//         audio: true,
+//         video: true,
+//       },
+//       (stream) => {
+//         localVideo.srcObject = stream;
+//         localStream = stream;
+
+//         call.answer(stream);
+//         call.on("stream", (remoteStream) => {
+//           remoteVideo.srcObject = remoteStream;
+
+//           remoteVideo.className = "primary-video";
+//           localVideo.className = "secondary-video";
+//         });
+//       }
+//     );
+//   });
+// }
+
+// function startCall(otherUserId) {
+//   navigator.getUserMedia(
+//     {
+//       audio: true,
+//       video: true,
+//     },
+//     (stream) => {
+//       localVideo.srcObject = stream;
+//       localStream = stream;
+
+//       const call = peer.call(otherUserId, stream);
+//       call.on("stream", (remoteStream) => {
+//         remoteVideo.srcObject = remoteStream;
+
+//         remoteVideo.className = "primary-video";
+//         localVideo.className = "secondary-video";
+//       });
+//     }
+//   );
+// }
+
+// function toggleVideo(b) {
+//   if (b == "true") {
+//     localStream.getVideoTracks()[0].enabled = true;
+//   } else {
+//     localStream.getVideoTracks()[0].enabled = false;
+//   }
+// }
+
+// function toggleAudio(b) {
+//   if (b == "true") {
+//     localStream.getAudioTracks()[0].enabled = true;
+//   } else {
+//     localStream.getAudioTracks()[0].enabled = false;
+//   }
+// }

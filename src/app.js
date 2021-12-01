@@ -11,6 +11,7 @@ const app = express();
 
 /**Cho phep client lay anh tu server */
 app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+// app.set("view engine", "ejs");
 const publicDirectoryPath = path.join(__dirname, '../public');
 
 app.use(express.static(publicDirectoryPath));

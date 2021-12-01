@@ -3,6 +3,19 @@ const User = require('../models/User');
 const HttpError = require('../utils/http-error');
 
 class ConversationController {
+    async getConversationById(req, res, next) {
+        try {
+            const findConversation = await Conversation.findById(
+                req.params.conversationId,
+            );
+            if (!findConversation)
+                return next(new HttpError('Conversation invalid', 404));
+            res.status(200).send({ conversation: findConversation });
+        } catch (error) {
+            return next(new HttpError('System error', 500));
+        }
+    }
+
     async getConversations(req, res, next) {
         try {
             const conversations = await Conversation.find()
@@ -35,16 +48,6 @@ class ConversationController {
         }
     }
     async createConversation(req, res, next) {
-        const existingNameConversation = await Conversation.findOne({
-            name: req.body.name,
-        });
-        if (existingNameConversation)
-            return next(
-                new HttpError(
-                    'Conversation name is in use, please choose another name',
-                    400,
-                ),
-            );
         const newConversation = new Conversation({
             members: [req.user],
             name: req.body.name,
@@ -119,17 +122,18 @@ class ConversationController {
             if (!findConversation)
                 throw next(new HttpError('Conversation not found', 404));
 
-            let checkOwnerConversation = await Conversation.findOne({
-                _id: req.body.conversationId.toString(),
-                owner: req.user._id.toString(),
-            });
-            if (checkOwnerConversation)
-                return next(
-                    new HttpError(
-                        'You must change owner before leaving this conversation',
-                        403,
-                    ),
-                );
+            // let checkOwnerConversation = await Conversation.findOne({
+            //   _id: req.body.conversationId.toString(),
+            //   owner: req.user._id.toString(),
+            // });
+            // if (checkOwnerConversation)
+            //   return next(
+            //     new HttpError(
+            //       "You must change owner before leaving this conversation",
+            //       403
+            //     )
+            //   );
+
             const updateConversationMembers = findConversation.members.filter(
                 (userId) => userId._id.toString() !== req.user._id.toString(),
             );
@@ -239,6 +243,47 @@ class ConversationController {
             res.status(200).send({
                 message: 'Change conversation owner success',
             });
+        } catch (error) {
+            throw next(new HttpError('System error', 500));
+        }
+    }
+
+    async removeUserFromGroup(req, res, next) {
+        try {
+            if (!req.user) throw next(new HttpError('User not found!', 404));
+            const findConversation = await Conversation.findById(
+                req.body.conversationId,
+            );
+
+            if (!findConversation)
+                throw next(new HttpError('Conversation not found', 404));
+
+            let checkOwnerConversation = await Conversation.findOne({
+                _id: req.body.conversationId.toString(),
+                owner: req.user._id.toString(),
+            });
+
+            if (checkOwnerConversation) {
+                const updateConversationMembers =
+                    findConversation.members.filter(
+                        (user) =>
+                            user._id.toString() !== req.body.userId.toString(),
+                    );
+                console.log(updateConversationMembers);
+                findConversation.members = updateConversationMembers;
+                try {
+                    await findConversation.save();
+                } catch (error) {
+                    throw next(
+                        new HttpError(
+                            'Can not update quantity members in group',
+                            500,
+                        ),
+                    );
+                }
+                res.status(200).send({ message: 'Removed user from group' });
+            } else
+                return next(new HttpError('You not allowed to do this', 403));
         } catch (error) {
             throw next(new HttpError('System error', 500));
         }

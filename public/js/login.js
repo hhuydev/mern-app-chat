@@ -37,7 +37,8 @@ $(document).ready(() => {
           localStorage.setItem("secret", result.data.secret);
 
           // window.location.href = "/enable-2fa.html";
-          window.location.href = "/enable-2fa.html";
+          // window.location.href = "/enable-2fa.html";
+          window.location.href = "/trangchu.html";
         });
       }
       // Nếu tài khoản yêu cầu xác thực 2 lớp, sẽ hiện thông báo sau đó redirect qua trang verify

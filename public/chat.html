@@ -7,6 +7,10 @@
     <title>Chat App</title>
     <link rel="icon" href="./img/favicon.png" />
     <link rel="stylesheet" href="./css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    />
   </head>
   <body>
     <div class="chat">
@@ -24,6 +28,15 @@
             />
             <button>Send</button>
           </form>
+
+          <input id="fileupload" type="file" name="fileupload" />
+          <button id="upload-button" onclick="uploadFile()">Upload</button>
+
+          <input id="imgupload" type="file" name="imgupload" />
+          <button id="img-upload-button" onclick="uploadImg()">
+            Upload Img
+          </button>
+
           <button id="send-location">Send location</button>
           <p><a href="./chat-video.html">Video Call</a></p>
         </div>
@@ -47,6 +60,26 @@
         <span class="message__meta">{{createdAt}}</span>
       </p>
       <p>{{message}}</p>
+    </div>
+  </script>
+  <script id="message-file-template" type="text/html">
+    <div class="message">
+      <p>
+        <span class="message__name">{{username}}</span>
+        <span class="message__meta">{{createdAt}}</span>
+      </p>
+      <!-- <input type="file" value="{{message}}" /> -->
+      <p>{{message}}</p>
+    </div>
+  </script>
+  <script id="message-img-template" type="text/html">
+    <div class="message">
+      <p>
+        <span class="message__name">{{username}}</span>
+        <span class="message__meta">{{createdAt}}</span>
+      </p>
+      <!-- <input type="file" value="{{message}}" /> -->
+      <img src="{{message}}" />
     </div>
   </script>
   <script id="location-message-template" type="text/html">

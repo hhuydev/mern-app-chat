@@ -146,9 +146,10 @@ const sendVerifyEmail = (email, token) => {
             /* required */
             Body: {
                 /* required */
+
                 Text: {
                     Charset: 'UTF-8',
-                    Data: `Mã xác thực của bạn: ${token}`,
+                    Data: `Chào mừng bạn tham gia AloAlo, mã xác thực của bạn: ${token}`,
                 },
             },
             Subject: {

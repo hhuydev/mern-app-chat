@@ -5,6 +5,7 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/get-conversations', auth, conversationController.getConversations);
+
 router.post(
     '/create-conversation',
     auth,
@@ -15,11 +16,24 @@ router.get(
     auth,
     conversationController.getConversationByTwoUser,
 );
+
+router.get(
+    '/get-conversation/:conversationId',
+    conversationController.getConversationById,
+);
+
 router.post(
     '/invite-user-to-conversation',
     auth,
     conversationController.addUserToConversation,
 );
+
+router.post(
+    '/remove-user-from-conversation',
+    auth,
+    conversationController.removeUserFromGroup,
+);
+
 router.post(
     '/leave-conversation',
     auth,

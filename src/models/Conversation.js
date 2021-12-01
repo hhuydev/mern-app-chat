@@ -6,7 +6,6 @@ const ConversationSchema = new mongoose.Schema(
             type: String,
             minlength: 2,
             maxlength: 30,
-            unique: true,
             required: false,
         },
         members: {

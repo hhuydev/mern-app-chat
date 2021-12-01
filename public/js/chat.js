@@ -3,6 +3,7 @@ const $messageFormInput = $messageForm.querySelector("input");
 const $messageFormButton = $messageForm.querySelector("button");
 const $sendLocationButton = document.querySelector("#send-location");
 const $messages = document.querySelector("#messages");
+
 /**get query param from url tu form */
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -10,6 +11,13 @@ const { username, room } = Qs.parse(location.search, {
 
 /**Template */
 const messageTemplate = document.querySelector("#message-template").innerHTML;
+const messageFileTemplate = document.querySelector(
+  "#message-file-template"
+).innerHTML;
+const messageImgTemplate = document.querySelector(
+  "#message-img-template"
+).innerHTML;
+
 const locationTemplate = document.querySelector(
   "#location-message-template"
 ).innerHTML;
@@ -46,7 +54,7 @@ const socket = io
       users,
       room,
     });
-    console.log(user);
+    // console.log(user);
     document.querySelector("#sidebar").innerHTML = html;
   });
 
@@ -54,8 +62,34 @@ socket.on("message", (message) => {
   console.log(message);
   /**Dung mustache de render message ra html */
   const html = Mustache.render(messageTemplate, {
-    username: message.username,
+    username: message.user.username,
     message: message.text,
+    /**Format ngay thang nam bang thu vien Moment */
+    createdAt: moment(message.createdAt).format("h:m a"),
+  });
+  $messages.insertAdjacentHTML("beforeend", html);
+  autoscroll();
+});
+
+socket.on("file-message", (message) => {
+  console.log(message);
+  /**Dung mustache de render message ra html */
+  const html = Mustache.render(messageFileTemplate, {
+    username: message.user.username,
+    message: message.file,
+    /**Format ngay thang nam bang thu vien Moment */
+    createdAt: moment(message.createdAt).format("h:m a"),
+  });
+  $messages.insertAdjacentHTML("beforeend", html);
+  autoscroll();
+});
+
+socket.on("img-message", (message) => {
+  console.log(message);
+  /**Dung mustache de render message ra html */
+  const html = Mustache.render(messageFileTemplate, {
+    username: message.user.username,
+    message: message.file,
     /**Format ngay thang nam bang thu vien Moment */
     createdAt: moment(message.createdAt).format("h:m a"),
   });
@@ -77,24 +111,118 @@ $messageForm.addEventListener("submit", async (e) => {
   });
   $messageFormInput.value = "";
   $messageFormInput.focus();
-  await saveMessage(mytext, "6188cd91bb307eddf6af5134");
+  await saveMessage(mytext, "6191260ae9c3e67b7d225217");
 });
 
-// socket.on("updatedText", (message) => {
-//   if (!message) return;
-//   // console.log("This text has been arrived");
-// });
+// $fileSelect.addEventListener(
+//   "click",
+//   function (e) {
+//     if ($fileElem) {
+//       $fileElem.click();
+//     }
+//     e.preventDefault(); // prevent navigation to "#"
+//   },
+//   false
+// );
 
-socket.on("locationMessage", (locationLink) => {
-  // console.log(locationText);
-  const html = Mustache.render(locationTemplate, {
-    username: locationLink.username,
-    locationLink: locationLink.location,
-    createdAt: moment(locationLink.createdAt).format("h:m a"),
-  });
-  $messages.insertAdjacentHTML("beforeend", html);
-  autoscroll();
-});
+// $fileElem.addEventListener("change", handleFiles, false);
+
+// async function handleFiles() {
+//   if (!this.files.length) {
+//     fileList.innerHTML = "<p>No files selected!</p>";
+//   } else {
+//     // const mytext = e.target.textMessage.value;
+//     console.log(this.files);
+//     socket.emit("sendMessage", this.files, (error) => {
+//       // $messageFormButton.removeAttribute("disabled");
+
+//       // if (error) return console.log(error);
+//       if (!mytext) return;
+//       // else console.log(mytext);
+//     });
+//     await saveFileMessage(this.files, "6191260ae9c3e67b7d225217");
+
+//     fileList.innerHTML = "";
+//     const list = document.createElement("ul");
+//     fileList.appendChild(list);
+//     for (let i = 0; i < this.files.length; i++) {
+//       const li = document.createElement("li");
+//       list.appendChild(li);
+
+//       const img = document.createElement("img");
+//       img.src = URL.createObjectURL(this.files[i]);
+//       img.height = 60;
+//       img.onload = function () {
+//         URL.revokeObjectURL(this.src);
+//       };
+//       li.appendChild(img);
+//       const info = document.createElement("span");
+//       info.innerHTML =
+//         this.files[i].name + ": " + this.files[i].size + " bytes";
+//       li.appendChild(info);
+//     }
+//   }
+// }
+
+async function uploadFile() {
+  let formData = new FormData();
+  formData.append("files", fileupload.files[0]);
+  formData.append("conversationId", "6191260ae9c3e67b7d225217");
+  console.log(formData);
+
+  console.log(formData.get("files"));
+  await fetch("http://localhost:5000/api/messages/create-file-message", {
+    method: "POST",
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+    },
+  })
+    .then(() => {
+      socket.emit(
+        "send-file-message",
+        {
+          file: formData.get("files"),
+          conversationId: formData.get("conversationId"),
+        },
+        (error) => {
+          // if (error) return console.log(error);
+          if (!formData.get("files")) return;
+        }
+      );
+    })
+    .catch((err) => console.log(err));
+}
+
+async function uploadImg() {
+  let formData = new FormData();
+  formData.append("photos", imgupload.files[0]);
+  formData.append("conversationId", "6191260ae9c3e67b7d225217");
+  console.log(formData);
+
+  console.log(formData.get("photos"));
+  await fetch("http://localhost:5000/api/messages/create-img-message", {
+    method: "POST",
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+    },
+  })
+    .then(() => {
+      socket.emit(
+        "send-file-message",
+        {
+          file: formData.get("files"),
+          conversationId: formData.get("conversationId"),
+        },
+        (error) => {
+          // if (error) return console.log(error);
+          if (!formData.get("files")) return;
+        }
+      );
+    })
+    .catch((err) => console.log(err));
+}
 
 $sendLocationButton.addEventListener("click", () => {
   if (!navigator.geolocation)
@@ -132,6 +260,26 @@ const saveMessage = async (text, conversationId) => {
       {
         conversationId,
         text,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+      }
+    );
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const saveFileMessage = async (file, conversationId) => {
+  try {
+    const result = await axios.post(
+      "http://localhost:5000/api/messages/create-file-message",
+      {
+        conversationId,
+        files: file,
       },
       {
         headers: {

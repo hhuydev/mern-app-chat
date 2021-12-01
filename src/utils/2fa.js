@@ -35,7 +35,7 @@ const generateQRCode = async (otpAuth) => {
 const totpGenerate = (secret) => {
     const newTotp = {
         token: speakeasy.totp({ secret, encoding: 'base32' }),
-        remaining: 30 - Math.floor((new Date().getTime() / 1000.0) % 30),
+        remaining: 180 - Math.floor((new Date().getTime() / 1000.0) % 30),
     };
     return newTotp;
 };
