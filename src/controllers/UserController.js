@@ -1,16 +1,9 @@
 const User = require("../models/User");
 const HttpError = require("../utils/http-error");
 const jwt = require("jsonwebtoken");
+const { sendVerifyEmail } = require("../utils/send-mail");
 const {
-  sendWelcomeEmail,
-  sendCancleEmail,
-  sendVerifyEmail,
-} = require("../utils/send-mail");
-const {
-  generateOTPToken,
-  generateQRCode,
   generateUniqueSecret,
-  verifyOTPToken,
   totpGenerate,
   validateTotp,
 } = require("../utils/2fa");
@@ -26,7 +19,8 @@ class UserController {
       else {
         const newUser = new User({
           ...req.body,
-          avatar: "/uploads/images/_105901296_male.jpg",
+          avatar:
+            "https://firebasestorage.googleapis.com/v0/b/myappchat-25ec5.appspot.com/o/public%2Fimage%2Favatar%2Favatar_default.jpg?alt=media&token=fafa20de-4d90-422c-9740-abc678f426b2",
         });
         newUser.isOnline = true;
         newUser.isLocked = true;
@@ -120,7 +114,7 @@ class UserController {
 
   async update(req, res, next) {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ["username", "email", "password"];
+    const allowedUpdates = ["username", "email", "password", "avatar"];
     const isValidOperation = updates.every((update) =>
       allowedUpdates.includes(update)
     );
